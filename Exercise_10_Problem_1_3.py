@@ -110,26 +110,13 @@ url = 'https://kartta.hsy.fi/geoserver/wfs'
 
 # Specify parameters (read data in json format).
 # Available feature types in this particular data source: http://geo.stat.fi/geoserver/vaestoruutu/wfs?service=wfs&version=2.0.0&request=describeFeatureType
-import requests
-import geojson
-params = dict(service='WFS',
-              version='2.0.0',
-              request='GetFeature',
-              typeName='asuminen_ja_maankaytto:Vaestotietoruudukko_2018',
-              outputFormat='json')
-
-# Fetch data from WFS using requests
-r = requests.get(url, params=params)
 
 # Create GeoDataFrame from geojson
-pop = gpd.GeoDataFrame.from_features(geojson.loads(r.content))
-geodata = gpd.read_file("data/500m_mesh_suikei_2018_shape_13/500m_mesh_2018_13.shp")
+pop = gpd.read_file("data/500m_mesh_suikei_2018_shape_13/500m_mesh_2018_13.shp")
 # Change the name of a column
-pop = pop.rename(columns={'asukkaita': 'PTN_2020'})
 
 # See the column names and confirm that we now have a column called 'pop17'
-pop.columns
-pop = pop[['PTN_2020', 'geometry']]
+pop = pop[[ 'geometry','PTN_2020']]
 pop.crs = CRS.from_epsg(4612).to_wkt()
 geodata = geodata.to_crs(pop.crs)
 #TEST CODE
@@ -144,12 +131,14 @@ print(pop.head(3))
 # Create a spatial join between grid layer and buffer layer. 
 # YOUR CDOE HERE 10 for spatial join
 
+# Make a spatial join
 join = gpd.sjoin(geodata, pop, how="inner", op="intersects")
 
 # YOUR CODE HERE 11 to report how many people live within 1.5 km distance from each shopping center
-grouped = join.groupby(["name"])
+grouped = join.groupby("name")
 for key, group in grouped:
-    print('store: ', key,"\n", 'population:', sum(group['PTN_2020']))
+    print('store: ', key,"\n", 'population:',round(group['PTN_2020'].sum()))
+
 # **Reflections:**
 #     
 # - How challenging did you find problems 1-3 (on scale to 1-5), and why?
