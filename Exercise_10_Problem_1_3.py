@@ -29,7 +29,7 @@ from geopandas.tools import geocode
 
 # Geocode addresses using Nominatim. Remember to provide a custom "application name" in the user_agent parameter!
 #YOUR CODE HERE 2 for geocoding
-
+## geocording
 geo = geocode(data['addr'], provider='nominatim', user_agent='autogis_xx', timeout=4)
 
 #TEST CODE
@@ -44,6 +44,7 @@ print(type(geo))
 # Check that the coordinate reference system of the geocoded result is correctly defined, and **reproject the layer into JGD2011** (EPSG:6668):
 
 # YOUR CODE HERE 3 to set crs.
+## set crs
 geo = geo.to_crs(CRS.from_epsg(6668))
 #TEST CODE
 # Check layer crs
@@ -51,6 +52,7 @@ print(geo.crs)
 
 
 # YOUR CODE HERE 4 to join the tables
+## join the table
 geodata = geo.join(data)
 
 #TEST CODE
@@ -63,6 +65,7 @@ print(geodata.head())
 # Define output filepath
 out_fp = "shopping_centers.shp"
 # YOUR CODE HERE 5 to save the output
+##save the output
 geodata.to_file(out_fp)
 # TEST CODE
 # Print info about output file
@@ -75,8 +78,10 @@ print("Geocoded output is stored in this file:", out_fp)
  
 
 # YOUR CODE HERE 6 to create a new column
+## create new column "buffer"
 geodata['buffer']=None
 # YOUR CODE HERE 7 to set buffer column
+## set buffer column
 geodata['buffer'] = geodata['geometry'].to_crs(32634).buffer(distance=1500)
 #TEST CODE
 print(geodata.head())
@@ -94,6 +99,8 @@ print(round(gpd.GeoSeries(geodata["buffer"]).area / 1000000))
 # - Replace the values in `geometry` column with the values of `buffer` column:
 
 # YOUR CODE HERE 8 to replace the values in geometry
+##replace the values in geometry
+
 geodata['geometry'] = geodata['buffer']
 #TEST CODE
 print(geodata.head())
@@ -106,13 +113,12 @@ print(geodata.head())
 
 # YOUR CODE HERE 9
 # Read population grid data for 2018 into a variable `pop`. 
-
 pop = gpd.read_file("data/500m_mesh_suikei_2018_shape_13/500m_mesh_2018_13.shp")
-# Change the name of a column
-
-# See the column names and confirm that we now have a column called 'pop17'
+##Data extraction
 pop = pop[[ 'geometry','PTN_2020']]
+##set crs
 pop.crs = CRS.from_epsg(4612).to_wkt()
+## created variable calld "geodata"
 geodata = geodata.to_crs(pop.crs)
 #TEST CODE
 # Check your input data
@@ -130,7 +136,9 @@ print(pop.head(3))
 join = gpd.sjoin(geodata, pop, how="inner", op="intersects")
 
 # YOUR CODE HERE 11 to report how many people live within 1.5 km distance from each shopping center
+##Line breaks for readability
 print("\n")
+##Group and output data
 grouped = join.groupby('name')
 for key, group in grouped:
     print(round(group['PTN_2020'].sum()),'people live within 1.5 km from' , key,"\n",)
@@ -142,5 +150,7 @@ for key, group in grouped:
 # - What was difficult?
 
 # YOUR ANSWER HERE
+##I found it difficult because there was code that I had never touched before, and because the problem was a bit complicated.
+##It was so hard that it took me half a day to solve this problem, but I think I learned a lot of things from it.
 
 # Well done!
