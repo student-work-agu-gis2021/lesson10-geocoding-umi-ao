@@ -29,6 +29,7 @@ from geopandas.tools import geocode
 
 # Geocode addresses using Nominatim. Remember to provide a custom "application name" in the user_agent parameter!
 #YOUR CODE HERE 2 for geocoding
+
 geo = geocode(data['addr'], provider='nominatim', user_agent='autogis_xx', timeout=4)
 
 #TEST CODE
@@ -76,7 +77,7 @@ print("Geocoded output is stored in this file:", out_fp)
 # YOUR CODE HERE 6 to create a new column
 geodata['buffer']=None
 # YOUR CODE HERE 7 to set buffer column
-geodata['buffer'] = geodata['geometry'].buffer(distance=1500)
+geodata['buffer'] = geodata['geometry'].to_crs(32634).buffer(distance=1500)
 #TEST CODE
 print(geodata.head())
 
@@ -105,13 +106,7 @@ print(geodata.head())
 
 # YOUR CODE HERE 9
 # Read population grid data for 2018 into a variable `pop`. 
-# Specify the url for web feature service
-url = 'https://kartta.hsy.fi/geoserver/wfs'
 
-# Specify parameters (read data in json format).
-# Available feature types in this particular data source: http://geo.stat.fi/geoserver/vaestoruutu/wfs?service=wfs&version=2.0.0&request=describeFeatureType
-
-# Create GeoDataFrame from geojson
 pop = gpd.read_file("data/500m_mesh_suikei_2018_shape_13/500m_mesh_2018_13.shp")
 # Change the name of a column
 
@@ -135,9 +130,10 @@ print(pop.head(3))
 join = gpd.sjoin(geodata, pop, how="inner", op="intersects")
 
 # YOUR CODE HERE 11 to report how many people live within 1.5 km distance from each shopping center
-grouped = join.groupby("name")
+print("\n")
+grouped = join.groupby('name')
 for key, group in grouped:
-    print('store: ', key,"\n", 'population:',round(group['PTN_2020'].sum()))
+    print(round(group['PTN_2020'].sum()),'people live within 1.5 km from' , key,"\n",)
 
 # **Reflections:**
 #     
