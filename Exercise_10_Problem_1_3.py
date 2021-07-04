@@ -12,7 +12,6 @@ import pandas as pd
 from geopandas.tools import geocode
 from pyproj import CRS
 
-
 # Read the data (replace "None" with your own code)
 fp = r'shopping_centers.txt'
 data = pd.read_csv(fp, sep=';')
